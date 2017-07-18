@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { getIEVersion } from './utils/browser-utils';
-import baseStyles from './node-renderer-default.scss';
-import { isDescendant } from './utils/tree-data-utils';
+import React, { Component } from "react"
+import PropTypes from "prop-types"
+import { getIEVersion } from "./utils/browser-utils"
+import baseStyles from "./node-renderer-default.scss"
+import { isDescendant } from "./utils/tree-data-utils"
 
-let styles = baseStyles;
+let styles = baseStyles
 // Add extra classes in browsers that don't support flex
 if (getIEVersion < 10) {
   styles = {
@@ -13,7 +13,7 @@ if (getIEVersion < 10) {
     rowContents: `${styles.rowContents} ${styles.rowContents_NoFlex}`,
     rowLabel: `${styles.rowLabel} ${styles.rowLabel_NoFlex}`,
     rowToolbar: `${styles.rowToolbar} ${styles.rowToolbar_NoFlex}`,
-  };
+  }
 }
 
 class NodeRendererDefault extends Component {
@@ -36,6 +36,7 @@ class NodeRendererDefault extends Component {
       className,
       style,
       didDrop,
+      SubtitleWrapper,
       /* eslint-disable no-unused-vars */
       isOver: _isOver, // Not needed, but preserved for other renderers
       parentNode: _parentNode, // Needed for drag-and-drop utils
@@ -43,11 +44,11 @@ class NodeRendererDefault extends Component {
       startDrag: _startDrag, // Needed for drag-and-drop utils
       /* eslint-enable no-unused-vars */
       ...otherProps
-    } = this.props;
+    } = this.props
 
-    let handle;
+    let handle
     if (canDrag) {
-      if (typeof node.children === 'function' && node.expanded) {
+      if (typeof node.children === "function" && node.expanded) {
         // Show a loading symbol on the handle when the children are expanded
         //  and yet still defined by a function (a callback to fetch the children)
         handle = (
@@ -67,27 +68,27 @@ class NodeRendererDefault extends Component {
               <div className={styles.loadingCirclePoint} />
             </div>
           </div>
-        );
+        )
       } else {
         // Show the handle used to initiate a drag-and-drop
         handle = connectDragSource(<div className={styles.moveHandle} />, {
-          dropEffect: 'copy',
-        });
+          dropEffect: "copy",
+        })
       }
     }
 
-    const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
-    const isLandingPadActive = !didDrop && isDragging;
+    const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node)
+    const isLandingPadActive = !didDrop && isDragging
 
     return (
-      <div style={{ height: '100%' }} {...otherProps}>
+      <div style={{ height: "100%" }} {...otherProps}>
         {toggleChildrenVisibility &&
           node.children &&
           node.children.length > 0 &&
           <div>
             <button
               type="button"
-              aria-label={node.expanded ? 'Collapse' : 'Expand'}
+              aria-label={node.expanded ? "Collapse" : "Expand"}
               className={
                 node.expanded ? styles.collapseButton : styles.expandButton
               }
@@ -114,13 +115,13 @@ class NodeRendererDefault extends Component {
             <div
               className={
                 styles.row +
-                (isLandingPadActive ? ` ${styles.rowLandingPad}` : '') +
+                (isLandingPadActive ? ` ${styles.rowLandingPad}` : "") +
                 (isLandingPadActive && !canDrop
                   ? ` ${styles.rowCancelPad}`
-                  : '') +
-                (isSearchMatch ? ` ${styles.rowSearchMatch}` : '') +
-                (isSearchFocus ? ` ${styles.rowSearchFocus}` : '') +
-                (className ? ` ${className}` : '')
+                  : "") +
+                (isSearchMatch ? ` ${styles.rowSearchMatch}` : "") +
+                (isSearchFocus ? ` ${styles.rowSearchFocus}` : "") +
+                (className ? ` ${className}` : "")
               }
               style={{
                 opacity: isDraggedDescendant ? 0.5 : 1,
@@ -132,17 +133,17 @@ class NodeRendererDefault extends Component {
               <div
                 className={
                   styles.rowContents +
-                  (!canDrag ? ` ${styles.rowContentsDragDisabled}` : '')
+                  (!canDrag ? ` ${styles.rowContentsDragDisabled}` : "")
                 }
               >
                 <div className={styles.rowLabel}>
                   <span
                     className={
                       styles.rowTitle +
-                      (node.subtitle ? ` ${styles.rowTitleWithSubtitle}` : '')
+                      (node.subtitle ? ` ${styles.rowTitleWithSubtitle}` : "")
                     }
                   >
-                    {typeof node.title === 'function'
+                    {typeof node.title === "function"
                       ? node.title({
                           node,
                           path,
@@ -153,13 +154,9 @@ class NodeRendererDefault extends Component {
 
                   {node.subtitle &&
                     <span className={styles.rowSubtitle}>
-                      {typeof node.subtitle === 'function'
-                        ? node.subtitle({
-                            node,
-                            path,
-                            treeIndex,
-                          })
-                        : node.subtitle}
+                      <SubtitleWrapper>
+                        {node.subtitle}
+                      </SubtitleWrapper>
                     </span>}
                 </div>
 
@@ -178,7 +175,7 @@ class NodeRendererDefault extends Component {
           )}
         </div>
       </div>
-    );
+    )
   }
 }
 
@@ -188,12 +185,19 @@ NodeRendererDefault.defaultProps = {
   canDrag: false,
   toggleChildrenVisibility: null,
   buttons: [],
-  className: '',
+  className: "",
   style: {},
   parentNode: null,
   draggedNode: null,
   canDrop: false,
-};
+  SubtitleWrapper: function({ children }) {
+    return (
+      <span>
+        {children}
+      </span>
+    )
+  },
+}
 
 NodeRendererDefault.propTypes = {
   node: PropTypes.shape({}).isRequired,
@@ -209,6 +213,7 @@ NodeRendererDefault.propTypes = {
   buttons: PropTypes.arrayOf(PropTypes.node),
   className: PropTypes.string,
   style: PropTypes.shape({}),
+  SubtitleWrapper: PropTypes.any,
 
   // Drag and drop API functions
   // Drag source
@@ -223,6 +228,6 @@ NodeRendererDefault.propTypes = {
   // Drop target
   isOver: PropTypes.bool.isRequired,
   canDrop: PropTypes.bool,
-};
+}
 
-export default NodeRendererDefault;
+export default NodeRendererDefault
