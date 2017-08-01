@@ -14,4 +14,4 @@ yarn.lock
 
 # Build directories (Will be preserved by npm)
 dist
-build
+# build
